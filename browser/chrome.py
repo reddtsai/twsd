@@ -11,4 +11,5 @@ class Chrome_Browser:
         self.Browser = webdriver.Chrome(executable_path='./drivers/chromedriver', options=self.__option)
 
     def close(self):
+        self.Browser.close()
         self.Browser.quit()

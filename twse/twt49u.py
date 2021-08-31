@@ -14,7 +14,7 @@ class TWT49_Service:
         self.__db.connect()
         
     def get(self, from_year, from_month, from_date, to_year, to_month, to_date):
-        print("start twt49u")
+        print("start twt49u", from_year, to_year)
         
         cb = chrome.Chrome_Browser()
         cb.new_chrome_browser()
@@ -22,6 +22,7 @@ class TWT49_Service:
         try:
             # 除權除息計算結果表
             cb.Browser.get(self.__url_twt49)
+            time.sleep(2)
             # 資料日期
             select_from_year = Select(cb.Browser.find_element_by_xpath("//div[@id='d1']/select[@name='yy']"))
             select_from_year.select_by_value(from_year)
@@ -38,7 +39,7 @@ class TWT49_Service:
             cb.Browser.find_element_by_xpath("//form").submit()
 
             # wait
-            time.sleep(360)
+            time.sleep(5)
 
             # 全部
             select_all = Select(cb.Browser.find_element_by_name("report-table_length"))
@@ -53,19 +54,23 @@ class TWT49_Service:
             for tr in trs:
                 td = tr.find_all("td")
                 row = self.sql_val(td)
-                sql_val.append(row)
+                if row is not None:
+                    sql_val.append(row)
 
             # insert
-            self.__db.dividend_executemany("REPLACE INTO `twsd`.`dividend`(`stock_code`,`stock_name`,`dividend_date`,`declare_data`,`dividend_year`,`dividend_month`,`dividend_day`,`dividend`,`dividend_type`,`dividend_status`)VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", sql_val)
+            if len(sql_val) > 0:
+                self.__db.dividend_executemany("REPLACE INTO `twsd`.`dividend`(`stock_code`,`stock_name`,`dividend_date`,`declare_data`,`dividend_year`,`dividend_month`,`dividend_day`,`dividend`,`dividend_type`,`dividend_status`)VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", sql_val)
         except Exception as e:
             print(e)
         finally:
             cb.Browser.close()
-            print("stop twt49u")
+            print("stop twt49u", from_year, to_year)
         
     def sql_val(self, td):
-        cb = chrome.Chrome_Browser()
-        cb.new_chrome_browser()
+        row = None
+        td_len = len(td)
+        if td_len not in [15, 17]:
+            return row
         try:
             # 股票代號
             stock_code = td[1].text
@@ -95,28 +100,39 @@ class TWT49_Service:
 
             # 除權息
             dividend = None
-            if td[5].text != '':
-                td5 = td[5].text.replace(',', '')
-                dividend = float(td5)
-            
             # 除權息類型
             dividend_type = 0
-            txt6 = td[6].text
-            if txt6 == '息':
-                dividend_type = 2
-            elif txt6 == '權':
-                dividend_type = 1
-            elif txt6 == '權息':
-                dividend_type = 3
-            
+            if td_len == 15:
+                if td[5].text != '':
+                    td5 = td[5].text.replace(',', '')
+                    dividend = float(td5)
+                
+                txt6 = td[6].text
+                if txt6 == '息':
+                    dividend_type = 2
+                elif txt6 == '權':
+                    dividend_type = 1
+                elif txt6 == '權息':
+                    dividend_type = 3
+            elif td_len == 17:
+                if td[7].text != '':
+                    td7 = td[7].text.replace(',', '')
+                    dividend = float(td7)
+                
+                txt8 = td[8].text
+                if txt8 == '息':
+                    dividend_type = 2
+                elif txt8 == '權':
+                    dividend_type = 1
+                elif txt8 == '權息':
+                    dividend_type = 3
+                
             # 除權息狀態
             dividend_status = 1
+
             row = (stock_code, stock_name, dividend_date, declare_date, dividend_year, dividend_month, dividend_day, dividend, dividend_type, dividend_status)
         except Exception as e:
-            print('sql_val raise error')
             raise e
-        finally:
-            cb.Browser.close()
 
         return row
 
@@ -153,7 +169,6 @@ class TWT49_Service:
                 td = tr[1].find_all("td")
                 declare_date = td[0].text
         except Exception as e:
-            print('get_dividend_declare_date raise error')
             raise e
         finally:
             cb.Browser.close()
