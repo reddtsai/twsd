@@ -36,7 +36,7 @@ class TWSD_DB:
             for x in result:
                 print(x)
         
-    def dividend_executemany(self, sql, val):
+    def executemany(self, sql, val):
         with self._conn.cursor() as cursor:
             cursor.executemany(sql, val)
             self._conn.commit()

@@ -1,10 +1,21 @@
+import time
+from twse import class_main
+from twse import stock_day
 from twse import twt49u
 from twse import twt48u
-import time
+
 
 def main():
-    service_48 = twt48u.TWT48_Service()
-    service_48.collection()
+    service_sd = stock_day.Stock_Day_Service()
+    service_sd.collection('2330', '20210902')
+
+
+    # service_48 = twt48u.TWT48_Service()
+    # service_48.collection()
+
+    # service_cm = class_main.Class_Main_Service()
+    # service_cm.collection_stock_code()
+    # service_cm.collection_etf_code()
 
 def dividend_history():
     service_49 = twt49u.TWT49_Service()

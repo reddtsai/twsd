@@ -52,7 +52,7 @@ class TWT48_Service:
 
             # insert
             if len(sql_val) > 0:
-                self.__db.dividend_executemany(self.__sql, sql_val)
+                self.__db.executemany(self.__sql, sql_val)
         except Exception as e:
             print(e)
         finally:

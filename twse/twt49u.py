@@ -21,7 +21,7 @@ class TWT49_Service:
         
 
     def collection(self, from_year, from_month, from_date, to_year, to_month, to_date):
-        print("start twt49u", from_year, to_year)
+        print("start collecting twt49u", from_year, to_year)
         
         cb = chrome.Chrome_Browser()
         cb.new_chrome_browser()
@@ -69,12 +69,12 @@ class TWT49_Service:
 
             # insert
             if len(sql_val) > 0:
-                self.__db.dividend_executemany(self.__sql, sql_val)
+                self.__db.executemany(self.__sql, sql_val)
         except Exception as e:
             print(e)
         finally:
             cb.Browser.close()
-            print("stop twt49u", from_year, to_year)
+            print("stop collecting twt49u", from_year, to_year)
 
 
     def sql_val(self, td):
