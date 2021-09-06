@@ -10,7 +10,7 @@ class TWT48_Service:
 
     __db = None
     __sql = "REPLACE INTO `twsd`.`dividend`\
-    (`stock_code`,`stock_name`, `dividend_date`, `declare_data`, `dividend_year`, `dividend_month`, `dividend_day`, `dividend`, `dividend_type`)\
+    (`stock_code`, `stock_name`, `dividend_date`, `declare_data`, `dividend_year`, `dividend_month`, `dividend_day`, `dividend`, `dividend_type`)\
     VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
 
@@ -92,8 +92,8 @@ class TWT48_Service:
             # declare_date = get_dividend_declare_date(stock_code, yyy[0])
 
             # 除權息
-            dividend = None
-            if td[7].text != '':
+            dividend = 0
+            if td[7].text != '' and td[7].text != '尚未公告':
                 td7 = td[7].text.replace(',', '')
                 dividend = float(td7)
 

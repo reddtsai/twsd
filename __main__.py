@@ -6,9 +6,11 @@ from twse import twt48u
 
 
 def main():
-    service_sd = stock_day.Stock_Day_Service()
-    service_sd.collection('2330', '20210902')
+    share_price_history()
 
+    # service_sd = stock_day.Stock_Day_Service()
+    # service_sd.collection('0050', '2021', '9')
+    # time.sleep(2.5)
 
     # service_48 = twt48u.TWT48_Service()
     # service_48.collection()
@@ -16,6 +18,13 @@ def main():
     # service_cm = class_main.Class_Main_Service()
     # service_cm.collection_stock_code()
     # service_cm.collection_etf_code()
+
+
+def share_price_history():
+    service_sd = stock_day.Stock_Day_Service()
+
+    service_sd.collection_history('0050', 2017, 0, 2021, 9)
+
 
 def dividend_history():
     service_49 = twt49u.TWT49_Service()
